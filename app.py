@@ -1,4 +1,3 @@
-
 """
 Inventory Management System — Streamlit App
 """
@@ -9,6 +8,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 import data_manager as dm
+import user_manager as um
 
 # ── page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -97,7 +97,7 @@ h1, h2, h3 { font-family: 'Syne', sans-serif !important; font-weight: 800 !impor
 div[data-testid="stDataFrame"] { border-radius: var(--radius) !important; }
 div[data-testid="stDataFrame"] table { background: var(--surface) !important; }
 
-.stTabs [data-baseweb="tab"] { font-family: 'Syne', sans-serif !important; font-weight: 600; }
+.stTabs [data-baseweb="tab"] { font-family: 'Aptos Narrow', 'Aptos', sans-serif !important; font-weight: 600; }
 .stTabs [aria-selected="true"] { color: var(--accent) !important; border-bottom-color: var(--accent) !important; }
 
 .success-pill {
@@ -132,37 +132,35 @@ div[data-testid="stExpander"] {
 
 LIGHT_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
-
 :root {
-  --bg: #f4f6fb;
-  --surface: #ffffff;
-  --surface2: #f0f3fa;
-  --border: #d8dff0;
-  --accent: #2563eb;
-  --accent2: #ef4444;
-  --green: #059669;
-  --yellow: #d97706;
-  --text: #0f172a;
-  --muted: #64748b;
+  --bg: #f0ebe3;
+  --surface: #f7f3ed;
+  --surface2: #faf8f4;
+  --border: #e5ddd0;
+  --accent: #fff5b8;
+  --accent2: #d4a574;
+  --green: #6b9456;
+  --yellow: #b8941f;
+  --text: #1a1612;
+  --muted: #5a5450;
   --radius: 10px;
 }
 
 html, body, [data-testid="stAppViewContainer"] {
   background-color: var(--bg) !important;
   color: var(--text) !important;
-  font-family: 'Syne', sans-serif !important;
+  font-family: 'Aptos Narrow', 'Aptos', sans-serif !important;
 }
 [data-testid="stSidebar"] {
   background-color: var(--surface) !important;
   border-right: 1px solid var(--border);
 }
 .block-container { padding-top: 1.5rem !important; }
-h1, h2, h3 { font-family: 'Syne', sans-serif !important; font-weight: 800 !important; }
+h1, h2, h3 { font-family: 'Aptos Narrow', 'Aptos', sans-serif !important; font-weight: 800 !important; }
 .stButton > button {
-  background: var(--accent) !important; color: #fff !important;
+  background: var(--accent) !important; color: #3d3933 !important;
   border: none !important; border-radius: var(--radius) !important;
-  font-family: 'Syne', sans-serif !important; font-weight: 700 !important;
+  font-family: 'Aptos Narrow', 'Aptos', sans-serif !important; font-weight: 700 !important;
 }
 .stButton > button:hover { opacity: .85; }
 .stTextInput > div > div > input,
@@ -172,40 +170,78 @@ h1, h2, h3 { font-family: 'Syne', sans-serif !important; font-weight: 800 !impor
 .stDateInput > div > div > input {
   background: var(--surface2) !important; color: var(--text) !important;
   border: 1px solid var(--border) !important; border-radius: 8px !important;
+  font-family: 'New Times Roman', 'Times New Roman', serif !important;
 }
 .metric-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 1.2rem 1.4rem; margin-bottom: .6rem;
 }
-.metric-card .label { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
-.metric-card .value { color: var(--text); font-size: 1.8rem; font-weight: 800; margin-top: .2rem; }
-.metric-card .value.accent { color: var(--accent); }
-.metric-card .value.green  { color: var(--green); }
-.metric-card .value.yellow { color: var(--yellow); }
-.metric-card .value.red    { color: var(--accent2); }
+.metric-card .label { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; font-family: 'Aptos Narrow', 'Aptos', sans-serif !important; }
+.metric-card .value { color: #1a1612; font-size: 1.8rem; font-weight: 800; margin-top: .2rem; font-family: 'Aptos Narrow', 'Aptos', sans-serif !important; }
+.metric-card .value.accent { color: #8b6f47; }
+.metric-card .value.green  { color: #4a6b34; }
+.metric-card .value.yellow { color: #8b6f00; }
+.metric-card .value.red    { color: #a65628; }
 .section-header {
-  font-size: 1.05rem; font-weight: 700; color: var(--accent);
-  border-bottom: 2px solid var(--accent); padding-bottom: .4rem; margin-bottom: 1rem;
+  font-size: 1.05rem; font-weight: 700; color: #5a5450;
+  border-bottom: 2px solid #5a5450; padding-bottom: .4rem; margin-bottom: 1rem;
+  font-family: 'Aptos Narrow', 'Aptos', sans-serif !important;
 }
-.success-pill { background: #ecfdf5; color: var(--green); border: 1px solid #6ee7b7; border-radius: 20px; padding: .2rem .8rem; font-size: .8rem; display: inline-block; }
-.danger-pill  { background: #fef2f2; color: var(--accent2); border: 1px solid #fca5a5; border-radius: 20px; padding: .2rem .8rem; font-size: .8rem; display: inline-block; }
-.info-pill    { background: #eff6ff; color: var(--accent); border: 1px solid #93c5fd; border-radius: 20px; padding: .2rem .8rem; font-size: .8rem; display: inline-block; }
-.logo-text { font-size: 1.4rem; font-weight: 800; color: var(--accent); letter-spacing: -.02em; padding: .5rem 0 1.2rem; }
-.logo-text span { color: var(--green); }
+.success-pill { background: rgba(107,148,86,.15); color: #4a6b34; border: 1px solid rgba(107,148,86,.3); border-radius: 20px; padding: .2rem .8rem; font-size: .8rem; display: inline-block; font-family: 'Aptos Narrow', 'Aptos', sans-serif !important; }
+.danger-pill  { background: rgba(212,165,116,.15); color: #a65628; border: 1px solid rgba(212,165,116,.3); border-radius: 20px; padding: .2rem .8rem; font-size: .8rem; display: inline-block; font-family: 'Aptos Narrow', 'Aptos', sans-serif !important; }
+.info-pill    { background: rgba(255,245,184,.15); color: #8b6f00; border: 1px solid rgba(255,245,184,.3); border-radius: 20px; padding: .2rem .8rem; font-size: .8rem; display: inline-block; font-family: 'Aptos Narrow', 'Aptos', sans-serif !important; }
+.logo-text { font-size: 1.4rem; font-weight: 800; color: #5a5450; letter-spacing: -.02em; padding: .5rem 0 1.2rem; font-family: 'Aptos Narrow', 'Aptos', sans-serif !important; }
+.logo-text span { color: #4a6b34; }
 div[data-testid="stExpander"] { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: var(--radius) !important; }
 </style>
 """
 
 
 # ── session state ─────────────────────────────────────────────────────────────
-if "dark_mode" not in st.session_state:
-    st.session_state.dark_mode = True
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "username" not in st.session_state:
+    st.session_state.username = None
 if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
 if "confirm_delete" not in st.session_state:
     st.session_state.confirm_delete = None
 
-st.markdown(DARK_CSS if st.session_state.dark_mode else LIGHT_CSS, unsafe_allow_html=True)
+st.markdown(LIGHT_CSS, unsafe_allow_html=True)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# LOGIN PAGE
+# ═══════════════════════════════════════════════════════════════════════════════
+if not st.session_state.logged_in:
+    # Center the login form
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("---")
+        st.markdown('<h1 style="text-align: center;">📦 Inventory Pro</h1>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align: center; color: #5a5450; font-size: 0.95rem;">▸ RSSB Rani Bagh Centre • Stock Management Portal</p>', unsafe_allow_html=True)
+        st.markdown("---")
+        
+        st.markdown("### Login to Your Account")
+        login_username = st.text_input("Username", placeholder="Enter your username", key="login_user")
+        login_password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_pass")
+        
+        if st.button("🔓 Login", use_container_width=True, type="primary"):
+            if login_username and login_password:
+                success, msg = um.authenticate(login_username, login_password)
+                if success:
+                    st.session_state.logged_in = True
+                    st.session_state.username = login_username
+                    st.success("✅ " + msg)
+                    st.rerun()
+                else:
+                    st.error("❌ " + msg)
+            else:
+                st.error("⚠️ Please enter both username and password.")
+        
+        st.markdown("---")
+    
+    st.stop()  # Stop execution if not logged in
 
 
 # ── sidebar ───────────────────────────────────────────────────────────────────
@@ -233,9 +269,11 @@ with st.sidebar:
     to_date   = st.date_input("To",   value=date.today(),                       key="global_to")
 
     st.divider()
-    dark_toggle = st.toggle("🌙 Dark Mode", value=st.session_state.dark_mode)
-    if dark_toggle != st.session_state.dark_mode:
-        st.session_state.dark_mode = dark_toggle
+    st.markdown(f"**👤 User:** `{st.session_state.username}`", unsafe_allow_html=True)
+    
+    if st.button("🚪 Logout", use_container_width=True, type="secondary"):
+        st.session_state.logged_in = False
+        st.session_state.username = None
         st.rerun()
 
 page = st.session_state.page
@@ -299,7 +337,7 @@ if page == "Dashboard":
             fig = px.bar(trend_g, x="Month", y="Quantity", color="Type",
                          barmode="group",
                          color_discrete_map={"Purchase": "#4f8ef7", "Sale": "#f76c4f"},
-                         template="plotly_dark" if st.session_state.dark_mode else "plotly_white")
+                         template="plotly_white")
             fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                               legend=dict(orientation="h", y=-0.2), margin=dict(l=0,r=0,t=0,b=0))
             st.plotly_chart(fig, use_container_width=True)
@@ -313,7 +351,7 @@ if page == "Dashboard":
             fig2 = px.pie(top, names="Material Name", values="Current Stock",
                           hole=.45,
                           color_discrete_sequence=px.colors.qualitative.Bold,
-                          template="plotly_dark" if st.session_state.dark_mode else "plotly_white")
+                          template="plotly_white")
             fig2.update_layout(paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=0,r=0,t=0,b=0))
             st.plotly_chart(fig2, use_container_width=True)
         else:
@@ -576,7 +614,7 @@ elif page == "Reports":
 
         fig = px.bar(df_s.nlargest(15, "Current Stock"), x="Material Name", y="Current Stock",
                      color="Current Stock", color_continuous_scale="blues",
-                     template="plotly_dark" if st.session_state.dark_mode else "plotly_white")
+                     template="plotly_white")
         fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", margin=dict(l=0,r=0,t=0,b=0))
         st.plotly_chart(fig, use_container_width=True)
 
@@ -777,6 +815,85 @@ elif page == "Settings":
             if st.button("💣 Clear ALL Data"):
                 st.session_state.confirm_delete = "clear_all"
                 st.rerun()
+
+    st.markdown('<div class="section-header">Account Settings</div>', unsafe_allow_html=True)
+    
+    account_tab1, account_tab2, account_tab3 = st.tabs(["🔐 Change Password", "👥 Manage Users", "ℹ️ Account Info"])
+    
+    with account_tab1:
+        st.markdown("### Change Your Password")
+        cp_old = st.text_input("Current Password", type="password", key="cp_old")
+        cp_new = st.text_input("New Password", type="password", key="cp_new", help="Min 6 characters")
+        cp_confirm = st.text_input("Confirm New Password", type="password", key="cp_confirm")
+        
+        if st.button("🔄 Change Password", type="primary"):
+            if not cp_old or not cp_new:
+                st.error("⚠️ Please fill in all fields.")
+            elif cp_new != cp_confirm:
+                st.error("⚠️ New passwords don't match.")
+            else:
+                success, msg = um.change_password(st.session_state.username, cp_old, cp_new)
+                if success:
+                    st.success("✅ " + msg)
+                else:
+                    st.error("❌ " + msg)
+    
+    with account_tab2:
+        st.markdown("### User Management")
+        if st.session_state.username == "admin":
+            st.info("ℹ️ Only admin users can manage other users.")
+            
+            user_action = st.selectbox("Select Action", ["Add User", "View Users", "Delete User"])
+            
+            if user_action == "Add User":
+                st.markdown("**➕ Create New User**")
+                new_username = st.text_input("Username", placeholder="Enter new username", key="new_user")
+                new_password = st.text_input("Password", type="password", placeholder="At least 6 characters", key="new_pass")
+                new_email = st.text_input("Email (optional)", placeholder="user@email.com", key="new_email")
+                
+                if st.button("✅ Create User", type="primary"):
+                    if not new_username or not new_password:
+                        st.error("⚠️ Username and password are required.")
+                    else:
+                        success, msg = um.add_user(new_username, new_password, new_email)
+                        if success:
+                            st.success("✅ " + msg)
+                            st.rerun()
+                        else:
+                            st.error("❌ " + msg)
+            
+            elif user_action == "View Users":
+                users_list = um.get_all_users()
+                st.markdown("**Current Users:**")
+                for user in users_list:
+                    user_badge = "👑 Admin" if user == "admin" else "👤 User"
+                    st.caption(f"{user} — {user_badge}")
+            
+            elif user_action == "Delete User":
+                users_list = um.get_all_users()
+                users_to_delete = [u for u in users_list if u != "admin"]
+                
+                if users_to_delete:
+                    del_user = st.selectbox("Select User to Delete", users_to_delete)
+                    if st.button("🗑️ Delete User", type="secondary"):
+                        success, msg = um.delete_user(del_user)
+                        if success:
+                            st.success("✅ " + msg)
+                            st.rerun()
+                        else:
+                            st.error("❌ " + msg)
+                else:
+                    st.info("Only admin user exists.")
+        else:
+            st.info("👤 User management is only available to admin users.")
+    
+    with account_tab3:
+        st.markdown("### Account Information")
+        st.write(f"**Username:** `{st.session_state.username}`")
+        all_users = um.get_all_users()
+        is_admin = st.session_state.username == "admin"
+        st.write(f"**Role:** {'👑 Administrator' if is_admin else '👤 Regular User'}")
+        st.write(f"**Total Users:** {len(all_users)}")
 
     st.markdown('<div class="section-header">About</div>', unsafe_allow_html=True)
     st.markdown("""
