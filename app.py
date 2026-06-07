@@ -1,3 +1,4 @@
+
 """
 Inventory Management System — Streamlit App
 """
